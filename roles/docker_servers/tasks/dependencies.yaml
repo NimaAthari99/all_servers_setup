@@ -1,0 +1,25 @@
+---
+
+- name: Update and upgrade apt packages
+  become: 'yes'
+  apt:
+    update_cache: yes
+    upgrade: yes
+    cache_valid_time: 86400
+  tags:
+    - docker-config
+    - docker-dependencies
+    
+- name: Install Dependencies
+  become: 'yes'
+  apt:
+    name: "{{ dependencies }}"
+    state: present
+    force_apt_get: yes
+    update_cache: yes
+    allow_downgrade: yes
+  tags:
+    - docker-config
+    - docker-dependencies
+
+...

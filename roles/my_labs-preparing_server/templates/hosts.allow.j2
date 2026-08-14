@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+# sshd : ALLOWED : ALLOW
+# ALLOWED: LOCAL, 127.0.0.1, 192.168.56.1, 10.255.255.254, 37.148.111.92, 192.168.250.20, 172.20.10.2
+
+# Nima-PC
+sshd: main.nima.local
+
+# Git Runner
+sshd: runner-server-1.nima.local
+
+# Localhost (important!)
+sshd: 127.0.0.1
+sshd: [::1]
+EOF

@@ -1,0 +1,26 @@
+- name: Install Nginx
+  include_tasks: install.yml
+  tags:
+    - nginx-install
+
+- name: Configure Nginx
+  include_tasks: configure.yml
+  tags:
+    - nginx-config
+
+- name: Create test files
+  include_tasks: create_files.yml
+  tags:
+    - nginx-test_files
+
+- name: Configure web authentication
+  include_tasks: auth.yml
+  tags:
+    - nginx-auth
+
+- name: Add iptables rule for nginx service
+  include_tasks: iptables.yaml
+  tags:
+    - nginx-iptables
+  
+...

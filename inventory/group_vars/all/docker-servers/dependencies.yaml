@@ -1,0 +1,10 @@
+dependencies:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - git
+  # - libip6tc2:amd64=1.8.9-2       # If needed and gets error
+  # - libip4tc2:amd64=1.8.9-2       # If needed and gets error
+  # - libxtables12:amd64=1.8.9-2    # If needed and gets error
+  # - iptables:amd64=1.8.9-2        # If needed and gets error

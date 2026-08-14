@@ -1,0 +1,15 @@
+---
+
+- name: Restart ssh
+  ansible.builtin.service:
+    name: "{{ ssh_service_name }}"
+    state: restarted
+  vars:
+    ssh_service_name: >-
+      {{ 'ssh'
+         if ansible_os_family == 'Debian'
+         else 'sshd' }}
+  tags:
+    - ssh-config
+
+...

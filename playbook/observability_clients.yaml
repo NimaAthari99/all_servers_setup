@@ -1,0 +1,10 @@
+---
+
+- name: Install And Configure Observability Clients
+  hosts: "{{ target_hosts | default('docker_servers') }}"
+  become: yes
+  gather_facts: yes
+  roles:
+    - { role: roles/observability_clients, become: yes, tags: observability }
+
+...

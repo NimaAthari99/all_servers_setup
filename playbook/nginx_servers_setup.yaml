@@ -1,0 +1,9 @@
+---
+
+- name: Deploy Static Website with Authentication
+  hosts: nginx_servers
+  become: yes
+  roles:
+    - roles/nginx_servers
+
+...

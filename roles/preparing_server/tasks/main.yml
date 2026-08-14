@@ -1,0 +1,67 @@
+---
+
+# Root Bash Config
+- name: Set Root `.bashrc`
+  import_tasks: bashrc.yml
+  tags: set_root_bashrc
+  when: root_bashrc_active == true
+
+# Apt Repository
+- name: Set Apt Mirror Repository
+  import_tasks: mirror.yml
+  tags: set_apt_mirror
+  when: mirror_apt_active == true
+
+# Use When Needed
+- name: Set Nima Apt Proxy
+  import_tasks: apt-proxy.yml
+  tags: set_apt_proxy
+  when: apt_proxy_active == true
+
+# Use When Needed
+- name: Sources File Configure
+  import_tasks: sources.yml
+  tags: sources
+  when: souces_active == true
+
+- name: Change `resolved.conf`
+  import_tasks: resolvedconf.yml
+  tags: hardening
+
+- name: Install And Update Packages
+  import_tasks: packages.yml
+  tags: install_packages
+
+- name: Change limit.conf
+  import_tasks: limits.yml
+  tags: tuning
+
+- name: Configure iptabels and ...
+  import_tasks: hardening.yml
+  tags: hardening, firewall
+
+- name: Configure Host File
+  import_tasks: hosts.yml
+  tags: hardening
+
+- name: Audit Log Configure
+  import_tasks: auditd.yml
+  tags: hardening
+
+- name: Config `fstab`
+  import_tasks: fstab.yml
+  tags: hardening
+
+- name: Change `journal.conf`
+  import_tasks: journalconf.yml
+  tags: hardening
+
+- name: Change `sysctl.conf`
+  import_tasks: tuning.yml
+  tags: tuning
+
+- name: Download And Config `lynis` Scripts
+  import_tasks: lynis.yml
+  tags: audit
+
+...

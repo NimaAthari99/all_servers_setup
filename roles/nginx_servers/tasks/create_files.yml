@@ -1,0 +1,13 @@
+---
+
+- name: Create test files
+  copy:
+    dest: "{{ nginx_root }}/{{ item.name }}"
+    content: "{{ item.content }}"
+  loop: "{{ sample_files }}"
+  notify: reload nginx
+  tags:
+    - nginx-config
+    - nginx-test_files
+
+...

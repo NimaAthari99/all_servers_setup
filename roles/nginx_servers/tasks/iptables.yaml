@@ -1,0 +1,12 @@
+---
+
+- name: Add custom iptables rules for 'nginx_servers' role
+  set_fact:
+    iptables_extra_rules: >
+      {{ iptables_extra_rules | default([]) +
+        ['-A CHECK_INPUT -p tcp -s 192.168.250.20 --dport 80 -j ACCEPT'] }}
+  tags:
+    - nginx-config
+    - nginx-iptables
+
+...

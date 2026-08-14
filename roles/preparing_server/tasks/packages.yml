@@ -1,0 +1,112 @@
+---
+
+- name: Check For Unconfigured Packages
+  ansible.builtin.command:
+    cmd: dpkg --audit
+  register: dpkg_audit
+  changed_when: false
+  failed_when: false
+  tags:
+    - apt_packages-audit
+    - apt_packages-fix
+
+- name: Configure GRUB Installation Device
+  ansible.builtin.debconf:
+    name: grub-pc
+    question: grub-pc/install_devices
+    value: "{{ grub_install_device }}"
+    vtype: multiselect
+  when:
+    - grub_install_device is defined
+    - "'grub-pc' in dpkg_audit.stdout"
+  tags:
+    - apt_packages-audit
+    - apt_packages-fix
+    - grub-fix
+
+- name: Mark GRUB Device As Configured
+  ansible.builtin.debconf:
+    name: grub-pc
+    question: grub-pc/install_devices_empty
+    value: "false"
+    vtype: boolean
+  when:
+    - grub_install_device is defined
+    - "'grub-pc' in dpkg_audit.stdout"
+  tags:
+    - apt_packages-audit
+    - apt_packages-fix
+    - grub-fix
+
+- name: Finish Interrupted Package Configuration
+  ansible.builtin.command:
+    cmd: dpkg --configure -a
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when:
+    - grub_install_device is defined
+    - "'grub-pc' in dpkg_audit.stdout"
+  tags:
+    - apt_packages-audit
+    - apt_packages-fix
+    - grub-fix
+
+- name: Recheck Package Database
+  ansible.builtin.command:
+    cmd: dpkg --audit
+  register: dpkg_audit_after_repair
+  changed_when: false
+  failed_when: false
+  tags:
+    - apt_packages-audit
+    - apt_packages-fix
+    - grub-fix
+
+- name: Stop If Package Database Still Requires Repair
+  ansible.builtin.fail:
+    msg: |
+      {{ inventory_hostname }} still has unconfigured packages.
+
+      dpkg --audit:
+      {{ dpkg_audit_after_repair.stdout }}
+  when: dpkg_audit_after_repair.stdout | trim | length > 0
+  tags:
+    - apt_packages-audit
+    - apt_packages-fix
+    - grub-fix
+
+- name: Update And Upgrade Apt Packages
+  ansible.builtin.apt:
+    upgrade: yes
+    update_cache: yes
+    autoremove: yes
+    autoclean: yes
+    # fix_broken: yes   # This is the key for --fix-missing ; Does'nt work for now
+    cache_valid_time: 86400
+  become: yes
+  tags: 
+    - apt_packages-update
+    - apt_packages-upgrade
+    - apt_packages-install
+
+- name: Fix Broken Packages
+  ansible.builtin.command:
+    cmd: apt-get -f install -y
+  become: yes
+  changed_when: false
+  tags:
+    - apt_packages-fix
+
+- name: Install Needed Tools
+  become: true
+  apt:
+    name: "{{ packages }}"
+    state: present
+    force_apt_get: yes
+    update_cache: yes
+  tags: 
+    - apt_packages-install
+    - apt_packages-update
+    - apt_packages-upgrade
+
+...

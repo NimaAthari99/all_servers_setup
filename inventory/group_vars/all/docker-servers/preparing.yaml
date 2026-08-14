@@ -1,0 +1,9 @@
+# `iptables` Configuration
+iptables:
+  network_adapter_access:
+    - lo
+  udp_port_access: []
+  trusted_Range:
+    - 192.168.250.0/24
+    - 192.168.56.0/24
+    - 10.0.0.0/8

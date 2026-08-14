@@ -1,0 +1,4 @@
+# Setup HTTP Proxy Configuration
+proxy_env:
+  http_proxy: http://nimaathari:nimaathari@main.nima.local:10808
+  https_proxy: "{{ http_proxy }}"

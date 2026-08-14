@@ -1,0 +1,76 @@
+---
+
+- name: Allow Insecure APT Repos
+  copy:
+    dest: /etc/apt/apt.conf.d/99insecure
+    content: |
+      Acquire::AllowInsecureRepositories "true";
+      Acquire::AllowDowngradeToInsecureRepositories "true";
+      APT::Get::AllowUnauthenticated "true";
+  tags:
+    - docker-config
+    - docker-install
+
+- name: Give GPG Key
+  get_url:
+    url: https://repo.nima.local/repository/debian-docker/gpg
+    dest: /usr/share/keyrings/docker.gpg
+    mode: '0644'
+    validate_certs: false
+  tags:
+    - docker-config
+    - docker-install
+
+# - name: Add Docker Repo
+#   apt_repository:
+#     repo: deb [arch=amd64 allow-insecure=yes] https://repo.nima.local/repository/debian-docker trixie stable
+#     filename: docker
+#     state: present
+#   tags:
+#     - docker-config
+#     - docker-install
+
+- name: Set Mirror `docker-repo.list`
+  template:
+    src: "docker-repo.j2"
+    dest: /etc/apt/sources.list.d/docker-repo.list
+    mode: '0644'
+    owner: root
+    group: root
+  tags: 
+    - docker-install
+    - docker-config
+
+- name: Install Docker
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+    allow_unauthenticated: yes    # For insecure repos
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+  tags:
+    - docker-config
+    - docker-install
+
+- name: Start And Enable Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  tags:
+    - docker-config
+    - docker-install
+
+- name: Add `nima` to docker Group
+  user:
+    name: nima
+    groups: docker
+    append: yes
+  tags:
+    - docker-config
+    - docker-install
+
+...

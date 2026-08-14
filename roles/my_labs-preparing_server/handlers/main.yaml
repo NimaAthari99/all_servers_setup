@@ -1,0 +1,78 @@
+---
+
+- name: Reboot After Network Configuration
+  ansible.builtin.reboot:
+    msg: "Reboot initiated by Ansible after network configuration update"
+    pre_reboot_delay: 5
+    post_reboot_delay: 10
+    connect_timeout: 10
+    reboot_timeout: 600
+    test_command: "whoami"
+  listen: Reboot After Network Configuration
+
+- name: Wait For Ansible Connection After Reboot
+  ansible.builtin.wait_for_connection:
+    delay: 5
+    sleep: 5
+    connect_timeout: 10
+    timeout: 300
+  listen: Reboot After Network Configuration
+
+- name: Restart ssh
+  systemd:
+    name: ssh
+    state: restarted
+  tags:
+    - ssh-config
+
+- name: Restart iptables
+  systemd:
+    name: netfilter-persistent
+    state: restarted
+  tags:
+    - iptables-config
+
+- name: Restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+  tags:
+    - fail2ban-config
+
+- name: Restart ntp
+  systemd:
+    name: ntp
+    state: restarted
+  tags: 
+    - ntp-config
+
+# https://github.com/ansible/ansible/issues/22171
+
+- name: Restart auditd
+  become: 'yes'
+  ansible.builtin.command: 
+    cmd: service auditd restart
+    changed_when: true
+  tags:
+    - auditd-config
+
+- name: Generate auditd
+  become: 'yes'
+  ansible.builtin.command: augenrules
+  tags:
+    - auditd-config
+
+- name: Reload systemd
+  become: 'yes'
+  ansible.builtin.systemd:
+    daemon_reload: 'yes'
+  tags:
+    - systemd-config
+
+- name: Update cracklib debian
+  become: 'yes'
+  ansible.builtin.command: update-cracklib
+  tags:
+    - cracklib-config
+
+...

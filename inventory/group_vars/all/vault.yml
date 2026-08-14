@@ -1,0 +1,5 @@
+vault_nima_username: "webadmin"
+vault_nima_password: "e52ZuNWY4KxF4WhLELUD"
+
+# Loki Config For Promtail
+LOKI_PASS: "0Y9PeWg2bWXicu7yqgjF"

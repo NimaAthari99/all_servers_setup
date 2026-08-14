@@ -1,0 +1,53 @@
+---
+
+- name: Prepare Servers
+  hosts: 
+    - nginx-server-1
+    - nginx-server-2
+  become: true
+  serial: 1
+  vars:
+    required_network_interfaces:
+      - enp0s3
+      - enp0s8
+  tasks:
+    - name: Configure Network Interfaces
+      ansible.builtin.include_role:
+        name: roles/my_labs-preparing_server
+
+    - name: Run Pending Network Reboot Handler Now
+      ansible.builtin.meta: flush_handlers
+
+    - name: Confirm Host Is Available After Reboot
+      ansible.builtin.ping:
+
+    - name: Display Active Addresses
+      ansible.builtin.command:
+        cmd: ip -br address
+      register: network_addresses
+      changed_when: false
+
+    - name: Show Active Addresses
+      ansible.builtin.debug:
+        var: network_addresses.stdout_lines
+
+- name: Passwordless Sudo Execution
+  hosts: all
+  become: false
+  # become_method: sudo
+  gather_facts: no
+  roles:
+  # Configure Passwordless Sudo For User(s)
+    - roles/superuser
+    # - { role: roles/superuser, become: True, tags: preparing_server }
+  vars_files:
+    - group_vars/all/vault.yml
+
+- name: Bootstrap SSH Port Migration
+# After change, use `managed_servers` instead of `all` servers
+  hosts: all
+  become: true
+  gather_facts: true
+  serial: 1
+  roles:
+    - roles/ssh_port_migration

@@ -1,0 +1,32 @@
+---
+
+- name: Passwordless Sudo Execution
+  hosts: all
+  become: false
+  # become_method: sudo
+  gather_facts: no
+  roles:
+  # Configure Passwordless Sudo For User(s)
+    - roles/superuser
+    # - { role: roles/superuser, become: True, tags: preparing_server }
+  vars_files:
+    # - group_vars/all/vault.yml
+
+- name: Bootstrap SSH Port Migration
+# After change, use `managed_servers` instead of `all` servers
+  hosts: all
+  become: true
+  gather_facts: true
+  serial: 1
+  roles:
+    - roles/ssh_port_migration
+
+- name: Configure All Servers
+  hosts: all
+  become: yes
+  gather_facts: yes
+  roles:
+  # Preparing Server & Hardening
+    - { role: roles/preparing_server, become: True, tags: preparing_server }
+
+...

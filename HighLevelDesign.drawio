@@ -1,0 +1,31 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="9LQgGL_3J7Fykm0omwur">
+    <mxGraphModel dx="1028" dy="722" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="M-HIRy45wT164RwntnmP-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Gitlab" vertex="1">
+          <mxGeometry height="80" width="80" x="60" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="M-HIRy45wT164RwntnmP-2" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#d5e8d4;strokeColor=#82b366;" value="Docker" vertex="1">
+          <mxGeometry height="80" width="80" x="200" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="M-HIRy45wT164RwntnmP-3" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Nginx" vertex="1">
+          <mxGeometry height="80" width="80" x="60" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="M-HIRy45wT164RwntnmP-4" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Apache" vertex="1">
+          <mxGeometry height="80" width="80" x="200" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="M-HIRy45wT164RwntnmP-5" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Wordpress" vertex="1">
+          <mxGeometry height="80" width="80" x="320" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="M-HIRy45wT164RwntnmP-6" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Traefik" vertex="1">
+          <mxGeometry height="80" width="80" x="440" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="M-HIRy45wT164RwntnmP-7" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="" vertex="1">
+          <mxGeometry height="80" width="80" x="60" y="310" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

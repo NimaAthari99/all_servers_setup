@@ -1,0 +1,10 @@
+# deb http://{{ mirror_domain_name }}/repository/debian_trixie/ trixie main
+# deb http://{{ mirror_domain_name }}/repository/debian_trixie-updates-updatesian/ trixie-updates main
+# deb http://{{ mirror_domain_name }}/repository/debian_trixie-backports/ trixie-backports main
+# deb http://{{ mirror_domain_name }}/repository/debian_trixie/ trixie-security main
+
+# If Doesn't Have SSL (Unsecure):
+deb [trusted=yes] http://repo.nima.local/repository/debian_trixie trixie main
+deb [trusted=yes] http://repo.nima.local/repository/debian_trixie trixie-updates main
+#deb [trusted=yes] http://repo.nima.local/repository/debian_trixie-backports trixie-backports main
+deb [trusted=yes] http://repo.nima.local/repository/debian-security_trixie trixie-security main

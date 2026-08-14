@@ -1,0 +1,26 @@
+---
+
+- name: Add sudoers file for users
+  become: true
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ item }}"
+    content: "{{ item }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  loop: "{{ sudo_users }}"
+  tags:
+    - sudoers-config
+
+- name: Reset SSH Connection
+  meta: reset_connection
+  tags: 
+    - sudoers-config
+
+- name: Verify Connection
+  ansible.builtin.ping:
+  tags: 
+    - ssh-config
+
+...

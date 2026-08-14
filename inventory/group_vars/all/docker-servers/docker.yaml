@@ -1,0 +1,15 @@
+# HTTP Proxy
+http_proxy: http://main.nima.local:10808
+
+# Proxy Environment
+proxy_env:
+  http_proxy: "{{ http_proxy }}"
+  https_proxy: "{{ http_proxy }}"
+
+# Docker Variables
+docker:
+  http_proxy: "{{ http_proxy }}"
+  no_proxy: localhost,127.0.0.1,repo.nima.local
+  log_max_file: "5"
+  log_max_size: 100m
+  registry_mirror: https://repo.nima.local

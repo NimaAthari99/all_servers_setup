@@ -1,0 +1,312 @@
+---
+
+all:
+
+  vars:
+    ansible_user: root
+    ansible_port: 8090
+    ansible_user_sudo: true
+    ansible_ssh_private_key_file: /home/github-runner/.ssh/ansible_ed25519
+    grub_install_device: /dev/sda
+    domain_name: nima.local
+
+  children:
+
+###########################################################
+
+    # SRV-H1-IT:
+    it_servers:
+      hosts:
+        # SRV-H1-IT-01:  
+        it-server-1:
+        # SRV-H1-IT-02:  
+        vcenter-server-1:
+        # SRV-H1-IT-03:  
+        esxi-server-1:
+        # SRV-H1-IT-04:  
+        ad-server-1:
+        # SRV-H1-IT-05:  
+        adbkp-server-1:
+        # SRV-H1-IT-06:  
+        dns-server-1:
+        # SRV-H1-IT-07:  
+        monitoring-server-1:
+        # SRV-H1-IT-08:  
+        solar-server-1:
+        # SRV-H1-IT-09:  
+        zabbix-server-1:
+
+###########################################################
+
+    # SRV-H1-DevOps:
+    devops_servers:
+      hosts:
+        # SRV-H1-DEV-01:  
+        dev-server-1:
+          ansible_host: 192.168.250.20
+          ansible_user: nimaathari
+          ansible_port: 2201
+
+        # SRV-H1-Tools-01:
+        tools-server-1:
+          ansible_host: 192.168.250.31
+          ansible_ssh_private_key_file: ~/.ssh/ansible_ed25519
+
+        # SRV-H1-Backup-01:
+        backup-server-1:
+          ansible_host: 192.168.250.32
+        
+        # SRV-H1-GIT-01:
+        repo-server-1:
+          ansible_host: 192.168.250.33
+
+        # SRV-H1-GIT-02:
+        runner-server-1:
+          ansible_host: 192.168.250.34
+
+        # SRV-H1-GIT-01:
+        # gitlab-server-1:
+        #   ansible_host: 192.168.56.11
+        #   ansible_user: nima
+        #   ansible_port: 2211        
+        #   network_interfaces:
+        #     nat:
+        #       old_name: enp0s3
+        #     bridge:
+        #       old_name: enp0s8
+        #     hostonly:
+        #       old_name: enp0s9
+        #       ip: "192.168.56.12/24"
+
+        # SRV-H1-Test-01:
+        # test-server-1:
+        #   ansible_host: 192.168.250.157
+        #   ansible_port: 22
+
+        # SRV-H1-Test-02:
+        foo-server-1:
+          ansible_host: 192.168.250.51
+
+        # SRV-H1-Test-03:
+        bar-server-1:
+          ansible_host: 192.168.250.52
+
+        # SRV-H1-NGINX-01:
+        nginx-server-1:
+          ansible_host: 192.168.250.61
+
+        # SRV-H1-NGINX-02:
+        nginx-server-2:
+          ansible_host: 192.168.250.62
+          observability_method: prom
+
+        # SRV-H1-NGINX-03:
+        nginx-server-3:
+          ansible_host: 192.168.250.63
+          observability_method: prom
+        
+        # SRV-H1-NGINX-04:
+        nginx-server-4:
+          ansible_host: 192.168.250.64
+          observability_method: prom
+
+        # SRV-H1-WORDPRESS-01:
+        # wordpress-server-1:
+        #   ansible_host: 192.168.56.71
+        #   ansible_port: 2271
+
+  #     SRV-H1-SQL-01:
+  #       sql-server-1:
+  #         ansible_host: 192.168.56.91
+  #         ansible_port: 22
+  #         ansible_port_nima: 2291
+
+        # SRV-H1-Elk-01:
+        elk-server-1:
+          ansible_host: 192.168.250.41
+
+        # SRV-H1-Elk-02:
+        elk-server-2:
+          ansible_host: 192.168.250.42
+
+        # SRV-H1-Prom-01:
+        monlog-server-1:
+          ansible_host: 192.168.250.43
+
+        # SRV-H1-Prom-02:
+        monlog-server-2:
+          ansible_host: 192.168.250.44
+
+###########################################################
+
+    # SRV-H1-Test:
+    test_servers:
+      hosts:
+        # SRV-H1-Test-01:
+        # test-server-1:
+
+        # SRV-H1-Test-02:
+        foo-server-1:
+
+        # SRV-H1-Test-03:
+        bar-server-1:
+
+###########################################################
+
+    # SRV-H1-Tools:
+    tools_servers:
+      hosts:
+        # SRV-H1-Tools-01:
+        tools-server-1:
+
+        # SRV-H1-Backup-01:
+        backup-server-1:
+        
+        # SRV-H1-GIT-01:
+        repo-server-1:
+
+        # SRV-H1-GIT-02:
+        runner-server-1:
+
+###########################################################
+
+    # SRV-H1-GIT:
+    gitlab_servers:
+      hosts:
+        # SRV-H1-GIT-01:
+        repo-server-1:
+          
+        # SRV-H1-GIT-02:
+        runner-server-1:
+
+        # SRV-H1-GIT-01:
+        # gitlab-server-1:
+
+###########################################################
+
+    # SRV-H1-WEB:
+    web_servers:
+      children:  
+        # SRV-H1-NGINX:
+        nginx_servers:
+          hosts:
+            # SRV-H1-NGINX-01:
+            nginx-server-1:
+            # SRV-H1-NGINX-02:
+            nginx-server-2:
+
+            # SRV-H1-NGINX-03:
+            nginx-server-3:
+
+            # SRV-H1-NGINX-03:
+            nginx-server-4:
+
+        # SRV-H1-APACHE:
+        # apache-servers:
+        #   hosts:
+            # SRV-H1-NGINX-01:
+        #     apache2-server-1:
+
+        # SRV-H1-TRAEFIK:
+        # traefik-servers:
+        #   hosts:
+            # SRV-H1-Traefik-01:
+        #     traefik-server-1:
+
+###########################################################
+
+    # SRV-H1-WORDPRESS:
+    wordpress_servers:
+      hosts:
+        # SRV-H1-WORDPRESS-01:
+        wordpress-server-1:
+
+###########################################################
+
+    # SRV-H1-DATABASE:
+    database_servers:
+      children:
+        sql_servers:
+    #     hosts:
+    #     SRV-H1-SQL-01:
+    #       sql-server-1:
+
+        posgres_servers:
+
+        mongodb_servers:
+    
+###########################################################
+    
+    # SRV-H1-Monitoring:
+    monitoring_servers:
+      children:
+        elk_servers:
+          hosts:
+            # SRV-H1-Elk-01:
+            elk-server-1:
+
+            # SRV-H1-Elk-02:
+            elk-server-2:
+
+            # SRV-H1-Prom-01:
+            monlog-server-1:
+
+          # SRV-H1-Prom-02:
+          monlog-server-2:
+
+###########################################################
+
+    # SRV-H1-DOCKER:
+    docker_servers:
+      hosts:
+        # SRV-H1-Tools-01:
+        tools-server-1:
+
+        # SRV-H1-Backup-01:
+        backup-server-1:
+
+        # SRV-H1-GIT-01:
+        repo-server-1:
+
+        # SRV-H1-GIT-02:
+        runner-server-1:
+
+        # SRV-H1-DEV-01:  
+        dev-server-1:
+        
+        # SRV-H1-Elk-01:
+        elk-server-1:
+
+        # SRV-H1-Test-02:
+        foo-server-1:
+
+        # SRV-H1-Test-03:
+        bar-server-1:
+
+        # SRV-H1-Elk-02:
+        elk-server-2:
+
+        # SRV-H1-Prom-01:
+        monlog-server-1:
+
+        # SRV-H1-Prom-02:
+        monlog-server-2:
+
+        # SRV-H1-NGINX-01:
+        nginx-server-1:
+
+        # SRV-H1-NGINX-01:
+        nginx-server-2:
+
+        # SRV-H1-NGINX-03:
+        nginx-server-3:
+
+        # SRV-H1-NGINX-03:
+        nginx-server-4:
+
+        # SRV-H1-Apache2-01:
+        # apache2-server-1:
+
+        # SRV-H1-Traefik-01:
+        # traefik-server-1:
+

@@ -1,0 +1,33 @@
+---
+
+- name: Install apache2-utils for htpasswd
+  apt:
+    name: apache2-utils
+    state: present
+  tags:
+    - nginx-config
+    - ngnx-dependencies
+    - nginx-auth
+
+- name: Ensure python3-passlib is installed (required for htpasswd)
+  apt:
+    name: python3-passlib
+    state: present
+    update_cache: yes
+  tags:
+    - nginx-config
+    - ngnx-dependencies
+    - nginx-auth
+
+- name: Create htpasswd file
+  community.general.htpasswd:
+    path: "{{ htpasswd_path }}"
+    name: "{{ auth_user }}"
+    password: "{{ auth_password }}"
+  notify: restart nginx
+  tags:
+    - nginx-config
+    - ngnx-dependencies
+    - nginx-auth
+
+...

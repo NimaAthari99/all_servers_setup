@@ -1,0 +1,36 @@
+---
+
+- name: Create `Monlog Client` Directory If Doesn't Exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0775"
+  loop:
+    - "{{ monlog_client_dir }}"
+    - "{{ monlog_client_dir }}/promtail"
+  tags: 
+    - monlog_client-config
+
+- name: Copy `.env` File
+  template:
+    src: monlog.env.j2
+    dest: "{{ monlog_client_dir }}/.env"
+    mode: "0644"
+  tags: 
+    - monlog_client-config
+
+- name: Copy Multiple Files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - src: monlog-compose.yml
+      dest: "{{ monlog_client_dir }}/compose.yml"
+    - src: promtail/promtail.yml
+      dest: "{{ monlog_client_dir }}/promtail/promtail.yml"
+  tags: 
+    - monlog_client-config
+
+...

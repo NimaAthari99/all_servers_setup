@@ -1,0 +1,8 @@
+---
+
+# User which executions will be on for this role
+sudo_users:
+  - nima
+  - debian
+
+...

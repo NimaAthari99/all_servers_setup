@@ -1,0 +1,74 @@
+# Nima SSH Config File
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+# SSH Port
+Port {{ ssh_port|default('8090') }}
+
+# SSH Allowed Address
+ListenAddress {{ ansible_host|default('0.0.0.0') }}
+
+# Logging
+#SyslogFacility AUTH
+LogLevel VERBOSE
+
+# Authentication
+PermitRootLogin {{ sshd_config.PermitRootLogin|default('prohibit-password') }}
+StrictModes yes
+MaxAuthTries 3
+MaxSessions 2
+
+# Public Key Authentication
+PubkeyAuthentication yes
+
+# Authorized Keys File Path
+#AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+
+# Authentication By Password
+PasswordAuthentication {{ sshd_config.PasswordAuthentication|default('no') }}
+
+# Default SSH Banner Path
+Banner /etc/issue
+
+# SSH User Access
+{% if sshd_config.AllowUsers is defined %}
+AllowUsers {{ sshd_config.AllowUsers }} root
+{% endif %}
+{% if sshd_config.AllowGroups is defined %}
+AllowGroups {{ sshd_config.AllowGroups }} root
+{% endif %}
+
+# Change to "yes" to enable keyboard-interactive authentication.  Depending on
+# the system's configuration, this may involve passwords, challenge-response,
+# one-time passwords or some combination of these and other methods.
+# Beware issues with some PAM modules and threads.
+KbdInteractiveAuthentication no
+
+# Not Mine
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the KbdInteractiveAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via KbdInteractiveAuthentication may bypass
+# the setting of "PermitRootLogin prohibit-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and KbdInteractiveAuthentication to 'no'.
+UsePAM yes
+
+AllowAgentForwarding no
+AllowTcpForwarding no
+X11Forwarding no
+PrintMotd no
+TCPKeepAlive no
+Compression no
+ClientAliveCountMax 2
+
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+

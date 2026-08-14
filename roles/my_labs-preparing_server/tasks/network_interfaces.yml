@@ -1,0 +1,41 @@
+---
+
+- name: Collect Network Interface Facts
+  ansible.builtin.setup:
+    gather_subset:
+      - network
+
+- name: Verify Required Network Interfaces Exist
+  ansible.builtin.assert:
+    that:
+      - "'enp0s3' in ansible_interfaces"
+      - "'enp0s8' in ansible_interfaces"
+    fail_msg: >-
+      Required interfaces enp0s3 and enp0s8 were not both found.
+      Available interfaces: {{ ansible_interfaces | join(', ') }}
+    success_msg: "Required network interfaces are present."
+
+- name: Check If `ifupdown` Interfaces File Exists
+  ansible.builtin.stat:
+    path: /etc/network/interfaces
+  register: interfaces_file
+
+- name: Stop When The System Does Not Appear To Use `ifupdown`
+  ansible.builtin.assert:
+    that:
+      - interfaces_file.stat.exists
+    fail_msg: >-
+      /etc/network/interfaces does not exist. This system may be using
+      NetworkManager, systemd-networkd, Netplan, or another network manager.
+
+- name: Install Network Interfaces Configuration
+  ansible.builtin.template:
+    src: interfaces.j2
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+  notify: Reboot after network configuration
+
+...

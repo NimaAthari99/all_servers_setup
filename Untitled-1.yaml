@@ -1,0 +1,49 @@
+---
+- name: Configure SSH socket
+  hosts: all
+  become: true
+  serial: 1
+
+  vars:
+    ssh_socket_port: 2222
+
+  tasks:
+    - name: Create ssh.socket override directory
+      ansible.builtin.file:
+        path: /etc/systemd/system/ssh.socket.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Configure ssh.socket override
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/ssh.socket.d/override.conf
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          [Socket]
+          ListenStream=
+          ListenStream={{ ssh_socket_port }}
+      notify:
+        - Reload systemd
+        - Restart ssh socket
+
+    - name: Allow new SSH port in UFW
+      community.general.ufw:
+        rule: allow
+        port: "{{ ssh_socket_port }}"
+        proto: tcp
+      when: ansible_facts.services['ufw.service'] is defined
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+
+    - name: Restart ssh socket
+      ansible.builtin.systemd_service:
+        name: ssh.socket
+        state: restarted
+        enabled: true

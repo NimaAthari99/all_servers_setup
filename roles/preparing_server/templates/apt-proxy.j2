@@ -1,0 +1,5 @@
+Aquire::http::Proxy "http://{{ apt_proxy_address }}:{{ apt_proxy_port }}";
+Aquire::https::Proxy "http://{{ apt_proxy_address }}:{{ apt_proxy_port }}";
+{% if mirror_apt_active is true %}
+Aquire::http::Proxy::{{ mirror_domain_name }} Direct;
+% endif %

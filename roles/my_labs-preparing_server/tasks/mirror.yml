@@ -1,0 +1,68 @@
+---
+
+- name: Delete File `sources.list`
+  ansible.builtin.file:
+    state: absent
+    path: /etc/apt/sources.list
+  tags: 
+    - mirror_sources-config
+
+- name: Delete Directory `sources.list.d`
+  ansible.builtin.file:
+    state: absent
+    path: /etc/apt/sources.list.d
+  tags: 
+    - mirror_sources-config
+
+- name: Create Directory `sources.list.d`
+  file:
+    path: /etc/apt/sources.list.d
+    state: directory
+    mode: '0755'
+  tags: 
+    - mirror_sources-config
+
+- name: Set Mirror Apt Repository
+  ansible.builtin.template:
+    src: >-
+      {{
+        'apt-repo-ubuntu.list.j2'
+        if ansible_distribution == 'Ubuntu'
+        else 'apt-repo.list.j2'
+      }}
+    dest: /etc/apt/sources.list.d/apt-repo.list
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+  when: ansible_distribution in ['Ubuntu', 'Debian']
+  tags:
+    - mirror_sources-config
+
+- name: Set Unsecure `99insecure-nexus`
+  template:
+    src: "99insecure-nexus.j2"
+    dest: /etc/apt/apt.conf.d/99insecure-nexus
+    mode: '0644'
+    owner: root
+    group: root
+  when: mirror_unsecure_apt_active == true
+  tags: 
+    - mirror_sources-config
+
+- name: Set Hostname
+  hostname:
+    name: '{{ inventory_hostname }}'
+  tags: 
+  - hardening
+  - hostname-config
+
+- name: Fix `/etc/hosts`
+  template:
+    src: "hosts.j2"
+    dest: "/etc/hosts"
+  tags: 
+  - hardening
+  - hosts_file-config
+
+...

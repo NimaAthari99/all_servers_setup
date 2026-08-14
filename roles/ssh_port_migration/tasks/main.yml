@@ -1,0 +1,205 @@
+---
+
+- name: Set SSH port
+  ansible.builtin.set_fact:
+    old_ssh_port: 22
+    ssh_port: 8090
+
+- name: Create SSH Socket Override Directory On Ubuntu
+  ansible.builtin.file:
+    path: /etc/systemd/system/ssh.socket.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when:
+    - ansible_distribution == "Ubuntu"
+  tags:
+    - ssh-config
+
+- name: Configure SSH socket port on Ubuntu
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ssh.socket.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Socket]
+      ListenStream=
+      ListenStream={{ ansible_host }}:{{ ssh_port | default(8090) }}
+      ListenStream=[::]:{{ ssh_port }}
+  when: ansible_distribution == "Ubuntu"
+  register: ssh_socket_override
+  tags:
+    - ssh-config
+
+- name: Reload systemd configuration
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ssh_socket_override.changed
+
+- name: Flush SSH handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Copy SSH Banner File
+  copy:
+    src: ssh_banner
+    dest: /etc/issue
+  tags: 
+    - ssh-config
+
+- name: Download `authorized_keys` From File Server
+  get_url:
+    url: "https://192.168.250.19/authorized_keys"
+    dest: /home/{{ ansible_user }}/.ssh/authorized_keys
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0640'
+    url_username: "{{ vault_nima_username | default(omit) }}"
+    url_password: "{{ vault_nima_password | default(omit) }}"
+    force: yes
+    validate_certs: no
+    timeout: 30
+  become: yes
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 5
+  ignore_errors: true
+  no_log: true
+  when:
+    - authorized_keys_user == true
+  tags: ssh_config
+
+- name: Download `authorized_keys` From File Server
+  get_url:
+    url: "https://192.168.250.19/authorized_keys"
+    dest: /{{ ansible_user }}/.ssh/authorized_keys
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0640'
+    url_username: "{{ vault_nima_username | default(omit) }}"
+    url_password: "{{ vault_nima_password | default(omit) }}"
+    force: yes
+    validate_certs: no
+    timeout: 30
+  become: yes
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 5
+  ignore_errors: true
+  no_log: true
+  when:
+    - authorized_keys_root == true
+  tags: ssh_config
+
+- name: Validate SSH configuration
+  ansible.builtin.command:
+    cmd: /usr/sbin/sshd -t
+  changed_when: false
+  tags:
+    - ssh-config
+
+- name: Reload systemd configuration
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ssh_socket_override.changed
+  tags:
+    - ssh-config
+
+- name: Check If `ufw` Exists
+  ansible.builtin.stat:
+    path: /usr/sbin/ufw
+  register: ufw_binary
+  tags: 
+    - ssh-config
+
+- name: Open SSH Port In `ufw`
+  community.general.ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+  when: ufw_binary.stat.exists
+  tags: 
+    - ssh-config
+
+- name: Open SSH Port In `iptables`
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ ssh_port }}"
+    jump: ACCEPT
+  ignore_errors: true
+  tags: 
+    - ssh-config
+
+- name: Deploy `sshd_config`
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "/usr/sbin/sshd -t -f %s"
+  notify: Restart ssh
+  tags: 
+    - ssh-config
+
+- name: Flush Handlers
+  meta: flush_handlers
+  tags: 
+    - ssh-config
+
+- name: Restart SSH socket on Ubuntu
+  ansible.builtin.systemd_service:
+    name: ssh.socket
+    state: restarted
+    enabled: true
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ssh_socket_override.changed
+  tags:
+    - ssh-config
+
+- name: Wait For New SSH Port
+  ansible.builtin.wait_for:
+    host: "{{ ansible_host | default(inventory_hostname) }}"
+    port: "{{ ssh_port }}"
+    timeout: 60
+    state: started
+  delegate_to: localhost
+  become: false
+  tags: 
+    - ssh-config
+
+- name: Use New SSH Port
+  ansible.builtin.set_fact:
+    ansible_port: "{{ ssh_port }}"
+  tags: 
+    - ssh-config
+
+- name: Reset SSH Connection
+  meta: reset_connection
+  tags: 
+    - ssh-config
+
+- name: Verify Connection
+  ansible.builtin.ping:
+  tags: 
+    - ssh-config
+
+- name: Change Runtime Inventory
+  add_host:
+    name: "{{ inventory_hostname }}"
+    ansible_host: "{{ ansible_host }}"
+    ansible_user: "{{ ansible_user }}"
+    ansible_port: "{{ ssh_port }}"
+  tags: 
+    - ssh-config
+
+...

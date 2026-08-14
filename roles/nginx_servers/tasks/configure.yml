@@ -1,0 +1,36 @@
+---
+
+- name: Ensure root folder exists
+  file:
+    path: "{{ nginx_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+  tags:
+    - nginx-config
+
+- name: Copy static website (if exists)
+  copy:
+    src: /var/www/html/old
+    dest: "{{ nginx_root }}"
+  ignore_errors: yes
+  tags:
+    - nginx-config
+
+- name: Deploy nginx configuration
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/{{ ansible_hostname }}.conf
+  notify: restart nginx
+  tags:
+    - nginx-config
+
+- name: Remove default nginx config
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx
+  tags:
+    - nginx-config
+  
+...

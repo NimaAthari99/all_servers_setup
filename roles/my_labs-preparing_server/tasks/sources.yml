@@ -1,0 +1,25 @@
+---
+
+# Remove Content Of `/etc/apt/sources.list` File
+- name: Empty `sources.list` File
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list
+    content: ""
+    owner: root
+    group: root
+    mode: '0644'
+  tags: 
+    - mirror_sources2-config
+
+- name: Copy `sources/debian` to `/etc/apt/sources.list.d/`
+  copy:
+    src: sources/debain/
+    dest: /etc/apt/sources.list.d/
+  tags: 
+    - mirror_sources2-config
+
+# If gets error
+# - name: Configure pending dpkg packages
+#   shell: dpkg --configure -a
+
+...

@@ -1,0 +1,13 @@
+---
+
+- name: Install & Config `Monlog Client`
+  import_tasks: monlog-client.yml
+  tags: monlog_clients
+  when: observability_method == "prom"
+
+- name: Install & Config `Elastic Agent`
+  import_tasks: elastic-agent.yml
+  tags: elastic_agent
+  when: observability_method == "elk"
+
+...

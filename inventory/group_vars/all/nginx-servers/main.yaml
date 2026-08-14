@@ -1,0 +1,12 @@
+nginx_server_name: "{{ ansible_hostname }}.nima.local"
+nginx_root: "/var/www/html/{{ ansible_hostname }}"
+htpasswd_path: "/etc/nginx/conf.d/{{ ansible_hostname }}.htpasswd"
+auth_user: "admin"
+auth_password: "Aa@123456@"
+
+sample_files:
+  - name: "test1.txt"
+    content: "Hi dear friend! I'm {{ auth_user }}. It's my first test file."
+
+  - name: "helloworld.txt"
+    content: "Hello World!"

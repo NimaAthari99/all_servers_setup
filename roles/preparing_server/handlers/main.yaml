@@ -1,0 +1,58 @@
+- name: Restart ssh
+  systemd:
+    name: ssh
+    state: restarted
+  tags:
+    - ssh-config
+
+- name: Restart iptables
+  systemd:
+    name: netfilter-persistent
+    state: restarted
+  tags:
+    - iptables-config
+
+- name: Restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+  tags:
+    - fail2ban-config
+
+- name: Restart ntp
+  systemd:
+    name: ntp
+    state: restarted
+  tags: 
+    - ntp-config
+
+# https://github.com/ansible/ansible/issues/22171
+
+- name: Restart auditd
+  become: 'yes'
+  ansible.builtin.command: 
+    cmd: service auditd restart
+    changed_when: true
+  tags:
+    - auditd-config
+
+- name: Generate auditd
+  become: 'yes'
+  ansible.builtin.command: augenrules
+  tags:
+    - auditd-config
+
+- name: Reload systemd
+  become: 'yes'
+  ansible.builtin.systemd:
+    daemon_reload: 'yes'
+  tags:
+    - systemd-config
+
+- name: Update cracklib debian
+  become: 'yes'
+  ansible.builtin.command: update-cracklib
+  tags:
+    - cracklib-config
+
+...

@@ -1,0 +1,8 @@
+# Monlog Client Directory
+main_dir: /opt/services
+monlog_client_dir: "{{ main_dir }}/monlog-client"
+
+# Loki Config For Promtail
+LOKI_SCHEME: http
+LOKI_URL: logs-1.nima.local:3100
+LOKI_USER: "lokiadmin"
